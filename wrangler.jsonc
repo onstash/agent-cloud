@@ -1,0 +1,13 @@
+{
+  "name": "cloud-coding",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-05",
+  "compatibility_flags": ["nodejs_compat"],
+  "worker_loaders": [{ "binding": "LOADER" }],
+  "rules": [
+    { "type": "Text", "globs": ["**/fixture/*.ts", "**/fixture/*.md"], "fallthrough": true },
+  ],
+  "containers": [{ "class_name": "Workspace", "scheduling_policy": "durable_object" }],
+  "durable_objects": { "bindings": [{ "name": "WORKSPACE", "class_name": "Workspace" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Workspace"] }],
+}
