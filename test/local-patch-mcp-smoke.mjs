@@ -11,7 +11,7 @@ const path = process.env.PATCH_SMOKE_PATH ?? "src/file.ts";
 
 const url = new URL(process.env.MCP_URL ?? "http://127.0.0.1:8802/mcp");
 
-const marker = "// cloud-coding patch handoff smoke";
+const marker = "// agent-cloud patch handoff smoke";
 
 assert.ok(token, "Set MCP_BEARER_TOKEN");
 

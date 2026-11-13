@@ -7,9 +7,9 @@ Keep the source repository and the trusted baseline outside the container.
 
 ## Decision and approaches
 
-Add a `/patch` operation to the Code Mode API. It remains callable through the
+Add a `/patch` operation to the workspace API. It remains callable through the
 existing MCP `execute` tool, so the top-level MCP surface stays `search` and
-`execute`. The Worker calls a fixed `/patch` endpoint on the host broker. The
+`execute`. The MCP adapter calls a fixed `/patch` endpoint on the trusted local broker. The
 broker reads baseline blobs from a repository and commit configured at startup,
 then reads the configured allowlisted files from the selected offline container.
 It compares them on the host and returns a unified patch. The model cannot
@@ -25,7 +25,7 @@ trusted baseline stays on the host.
 
 - Return changes only for files in the startup-configured allowlist and the
   pinned commit.
-- Require a running cloud-coding container with no mounts and Docker network
+- Require a running agent-cloud container with no mounts and Docker network
   mode `none`.
 - Read the exact commit selected before the task, even if the source branch
   later advances.

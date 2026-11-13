@@ -41,7 +41,7 @@ export function createPatch(input) {
     throw new Error("Pinned source baseline is unavailable or invalid");
   }
 
-  const directory = mkdtempSync(join(tmpdir(), "cloud-coding-patch-"));
+  const directory = mkdtempSync(join(tmpdir(), "agent-cloud-patch-"));
   let patch = "";
   const changedFiles = [];
   let totalBytes = 0;

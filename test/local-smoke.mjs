@@ -10,7 +10,7 @@ assert.ok(token, "Set MCP_BEARER_TOKEN to the local test token");
 
 assert.equal((await fetch(url)).status, 401);
 
-const client = new Client({ name: "cloud-coding-smoke", version: "1.0.0" });
+const client = new Client({ name: "agent-cloud-smoke", version: "1.0.0" });
 
 await client.connect(
   new StreamableHTTPClientTransport(url, {

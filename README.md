@@ -1,7 +1,7 @@
-# Cloud coding experiment
+# Agent cloud experiment
 
-This experiment gives an existing agent a disposable Cloudflare workspace.
-The MCP server exposes Cloudflare Code Mode `search` and `execute` tools.
+This experiment gives an existing agent a disposable hosted workspace.
+The MCP server exposes two tools: `search` and `execute`.
 The workspace starts with a small TypeScript bug and no credentials.
 The container has internet access disabled.
 
@@ -11,17 +11,23 @@ This is a learning experiment. It is not a production security boundary.
 ## Requirements
 
 - Node.js, pnpm, and Docker. Start the Docker daemon before local tests.
-- A Cloudflare account with the [Workers Paid plan](https://developers.cloudflare.com/sandbox/) for deployment.
 - Codex or another MCP client for interactive use.
 
 Run commands from the repository root. Install dependencies with `pnpm install`.
+
+## Commit messages
+
+Lefthook installs a `commit-msg` hook when you run `pnpm install`. The hook
+checks Conventional Commit messages. Use messages such as `feat: add package
+search` or `fix(workspace): preserve command exit status`. Add `!` before the
+colon for a breaking change, such as `feat!: change the execute contract`.
 
 ## Run locally
 
 Start the local server with a test token. Use this token only on your machine.
 
 ```sh
-pnpm exec wrangler dev --local --port 8799 --var MCP_BEARER_TOKEN:local-test-token-12345
+pnpm dev -- --local --port 8799 --var MCP_BEARER_TOKEN:local-test-token-12345
 ```
 
 In another terminal, run the smoke test:
@@ -33,31 +39,32 @@ MCP_BEARER_TOKEN=local-test-token-12345 node test/local-smoke.mjs
 The test checks authentication, tool discovery, the fixture fix, and a denied network request.
 It also checks the test status and patch. The test deletes its workspace at the end.
 One failed network request does not prove that all network access is blocked.
-Local Docker isolation is different from the deployed Cloudflare container isolation.
+Local Docker isolation is different from the deployed container isolation.
 
 To connect Codex, put the test token in its environment and add the server:
 
 ```sh
-export CLOUD_CODING_TOKEN=local-test-token-12345
-codex mcp add cloud-coding --url http://127.0.0.1:8799/mcp --bearer-token-env-var CLOUD_CODING_TOKEN
+export AGENT_CLOUD_TOKEN=local-test-token-12345
+codex mcp add agent-cloud --url http://127.0.0.1:8799/mcp --bearer-token-env-var AGENT_CLOUD_TOKEN
 ```
 
-Start a new Codex session with that environment. Ask it to use the `cloud-coding` MCP tools.
+Start a new Codex session with that environment. Ask it to use the `agent-cloud` MCP tools.
 Ask it to fix the fixture, run the tests, and show the patch.
 Codex may require approval for MCP tool calls. A session that denies approvals cannot complete this task.
 
 ## Deploy later
 
-First check the account plan and Cloudflare container charges.
-Use a unique, random bearer token for the deployed server.
-Set `MCP_BEARER_TOKEN` as a Worker secret with Wrangler. Do not put it in source files or chat.
-Use `wrangler deploy` from this package to deploy after you configure the account.
+Choose a runtime that supports the workspace isolation and resource limits this
+project requires. Record its costs and limits before deployment. Use a unique,
+random bearer token for the deployed server. Configure `MCP_BEARER_TOKEN` as a
+runtime secret. Do not put it in source files or chat. Deploy the runtime
+adapter using its documented deployment process.
 Use an HTTPS MCP URL and keep the bearer token in the client environment.
 
 ## Current limits
 
 - The local bridge has been tested with Codex and a small Prompt Shelf snapshot.
-- Cloudflare deployment and deployed network isolation have not yet been tested.
+- Deployment and deployed network isolation have not yet been tested.
 - The server uses one shared workspace for all holders of the token. It is for one trusted user and one task at a time.
 - The workspace is disposable. Cleanup or inactivity deletes its files.
 - Commands time out and output is capped. The implementation does not fully contain hostile process trees or output-file tampering.
@@ -65,7 +72,7 @@ Use an HTTPS MCP URL and keep the bearer token in the client environment.
 - The standard server starts with the bundled fixture. The local bridge can use a separately prepared workspace. Neither server clones repositories.
 - The fixture server returns a `diff -u` patch. Its managed image does not provide Git.
 - Local patch handoff supports modified text files in its configured allowlist. It does not include new, deleted, renamed, or binary files.
-- Code Mode is experimental. Its APIs may change.
+- The script sandbox library is experimental. Its APIs may change.
 
 ## Copy a local committed snapshot
 
@@ -94,13 +101,13 @@ Check the ID carefully. Then pass that ID and the reviewed paths:
 node scripts/snapshot.mjs <full-container-id> <reviewed-commit-id> path/to/reviewed-file
 ```
 
-The command accepts the local Node 24 image used by the current Cloudflare
+The command accepts the local Node 24 image used by the current local
 development runtime. It requires a matching workspace name and no Docker mounts.
 It uses the exact ID and does not start, stop, or remove containers.
 It creates `/workspace/snapshot` once. It fails if that directory already exists.
 The directory disappears when the disposable workspace is destroyed. The sandbox
 must have Node.js and an existing `/workspace` directory. This route is local
-Docker only; it does not work with a deployed Cloudflare container. It does not
+Docker only; it does not work with a deployed container. It does not
 prove the selected container belongs to this experiment. Container image names and
 the local Docker daemon are not security boundaries. The command does not add a
 host path or a snapshot upload operation to MCP. The normal MCP command tool can
@@ -133,7 +140,7 @@ manifest. Replace `<platform>` and `<pnpm-version>` first. This build uses the
 network and must be run separately from the offline preparation step.
 
 ```sh
-docker build --platform <platform> -t cloud-coding-setup - <<'DOCKERFILE'
+docker build --platform <platform> -t agent-cloud-setup - <<'DOCKERFILE'
 FROM node:24
 RUN npm install -g pnpm@<pnpm-version>
 DOCKERFILE
@@ -147,14 +154,14 @@ in the image or the selected files. The secret filter is only a backstop.
 
 Start a disposable execution container with the exact local runtime image digest
 used by this experiment. Replace the digest below with the digest reported by
-`docker inspect` for a local cloud-coding workspace. Use a unique name that
+`docker inspect` for a local agent-cloud workspace. Use a unique name that
 matches the example. The container must have no mounts.
 
 ```sh
-docker run -d --network none --name workerd-cloud-coding-Workspace-abcd \
+docker run -d --network none --name workerd-agent-cloud-Workspace-abcd \
   --entrypoint sleep docker.io/library/node:24.20.0-trixie-slim@sha256:<digest> infinity
-docker exec workerd-cloud-coding-Workspace-abcd mkdir -p /workspace
-docker inspect --format '{{.Id}}' workerd-cloud-coding-Workspace-abcd
+docker exec workerd-agent-cloud-Workspace-abcd mkdir -p /workspace
+docker inspect --format '{{.Id}}' workerd-agent-cloud-Workspace-abcd
 ```
 
 Then use the full container ID, the reviewed commit ID, the local setup image,
@@ -192,13 +199,13 @@ cache over the network. It then tests the offline preparation step. It requires
 a setup image with pnpm 10 and the matching managed Node image digest:
 
 ```sh
-CLOUD_CODING_TEST_IMAGE=<setup-image> CLOUD_CODING_NODE_IMAGE=<node-image-with-digest> \
+AGENT_CLOUD_TEST_IMAGE=<setup-image> AGENT_CLOUD_NODE_IMAGE=<node-image-with-digest> \
   node --test test/prepare.integration.test.mjs
 ```
 
 ## Connect the offline container to Codex
 
-The local bridge connects the prepared container to Cloudflare Code Mode. It
+The local bridge connects the prepared container to the script sandbox. It
 uses Docker on the host. The container receives no Docker socket or bridge token.
 The bridge accepts one container ID and checks its network and mounts before each
 command. This is a local experiment, not a production isolation boundary. It does
@@ -230,23 +237,24 @@ node scripts/local-broker.mjs
 ```
 
 Create `.dev.vars` with `LOCAL_BROKER_TOKEN` and
-`MCP_BEARER_TOKEN`. The cloud-coding `.gitignore` excludes this file. Keep it
-private and delete it when finished. Start the local Worker:
+`MCP_BEARER_TOKEN`. The agent-cloud `.gitignore` excludes this file. Keep it
+private and delete it when finished. Start the local MCP adapter:
 
 ```sh
-pnpm exec wrangler dev --local --config wrangler.local.jsonc --port 8802
+pnpm dev -- --local --config wrangler.local.jsonc --port 8802
 ```
 
 Connect a local Codex MCP client to `http://127.0.0.1:8802/mcp` with the MCP
 token. The agent can call `search` and `execute`. Commands start in `/`; use
-`cd /workspace/snapshot` to reach the prepared files. Stop the bridge and Worker
-when finished. Remove the temporary env file and destroy the execution container.
+`cd /workspace/snapshot` to reach the prepared files. Stop the bridge and MCP
+adapter when finished. Remove the temporary env file and destroy the execution
+container.
 
 After the agent edits and tests the workspace, it can request a patch through
-Code Mode `execute`:
+the `execute` tool:
 
 ```js
-async () => codemode.request({ method: "GET", path: "/patch" });
+async () => api.request({ method: "GET", path: "/patch" });
 ```
 
 The broker returns a complete unified patch for the configured files, or an
@@ -284,4 +292,4 @@ and the Docker socket, then makes one external network request that must fail.
 The execution container holds only the files selected for the snapshot and the
 installed dependencies. The setup host and packages must still be trusted. A
 single failed external request does not prove that every network path is blocked.
-Never deploy `wrangler.local.jsonc`; it is for local development only.
+Do not use the local bridge configuration in a deployed environment.

@@ -119,7 +119,7 @@ export function verifyTarget(id, requireNoNetwork = false) {
     inspected.length !== 1 ||
     container.Id !== id ||
     !container.State.Running ||
-    !/^\/workerd-cloud-coding(?:-[a-z0-9-]+)?-Workspace-[a-f0-9]+$/.test(container.Name) ||
+    !/^\/workerd-agent-cloud(?:-[a-z0-9-]+)?-Workspace-[a-f0-9]+$/.test(container.Name) ||
     !/^docker\.io\/library\/node:24\.20\.0-trixie-slim@sha256:[a-f0-9]{64}$/.test(
       container.Config.Image,
     ) ||
@@ -131,7 +131,7 @@ export function verifyTarget(id, requireNoNetwork = false) {
         !("none" in container.NetworkSettings.Networks)))
   )
     throw new Error(
-      "Target must be the full ID of a running local cloud-coding workspace with no mounts (and network mode none when required)",
+      "Target must be the full ID of a running local agent-cloud workspace with no mounts (and network mode none when required)",
     );
 }
 
