@@ -48,7 +48,7 @@ if (args[0] === 'inspect') {
   const port = probe.address().port;
   await new Promise((resolveClose) => probe.close(resolveClose));
 
-  const child = spawn(process.execPath, [resolve("agents/cloud-coding/scripts/local-broker.mjs")], {
+  const child = spawn(process.execPath, [resolve("scripts/local-broker.mjs")], {
     env: {
       ...process.env,
       PATH: `${dir}:${process.env.PATH}`,
@@ -124,7 +124,7 @@ if (args[0] === 'inspect') {
 });
 
 test("startup fails closed without credentials or a full container ID", async () => {
-  const child = spawn(process.execPath, [resolve("agents/cloud-coding/scripts/local-broker.mjs")], {
+  const child = spawn(process.execPath, [resolve("scripts/local-broker.mjs")], {
     env: { ...process.env, LOCAL_BROKER_TOKEN: "", LOCAL_BROKER_CONTAINER_ID: id },
     stdio: "ignore",
   });

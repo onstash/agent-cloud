@@ -1,10 +1,15 @@
 {
-  "name": "cloud-coding",
+  "name": "agent-cloud",
   "private": true,
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "dev": "wrangler dev"
+    "dev": "wrangler dev",
+    "format": "oxfmt src scripts test",
+    "format:check": "oxfmt --check src scripts test",
+    "lint": "oxlint src scripts test",
+    "test": "node --test test/local-broker.test.mjs test/patch.test.mjs test/prepare.integration.test.mjs test/snapshot.test.mjs",
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test"
   },
   "dependencies": {
     "@cloudflare/codemode": "^0.5.6",
@@ -15,8 +20,12 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261104.1",
+    "@oxlint/plugins": "^1.87.0",
     "@types/node": "^24.0.0",
+    "oxfmt": "^0.72.0",
+    "oxlint": "^1.87.0",
     "typescript": "^5.9.0",
     "wrangler": "^4.158.0"
-  }
+  },
+  "packageManager": "pnpm@10.10.0"
 }

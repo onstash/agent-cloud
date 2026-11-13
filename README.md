@@ -21,13 +21,13 @@ Run commands from the repository root. Install dependencies with `pnpm install`.
 Start the local server with a test token. Use this token only on your machine.
 
 ```sh
-pnpm --filter cloud-coding exec wrangler dev --local --port 8799 --var MCP_BEARER_TOKEN:local-test-token-12345
+pnpm exec wrangler dev --local --port 8799 --var MCP_BEARER_TOKEN:local-test-token-12345
 ```
 
 In another terminal, run the smoke test:
 
 ```sh
-MCP_BEARER_TOKEN=local-test-token-12345 node agents/cloud-coding/test/local-smoke.mjs
+MCP_BEARER_TOKEN=local-test-token-12345 node test/local-smoke.mjs
 ```
 
 The test checks authentication, tool discovery, the fixture fix, and a denied network request.
@@ -91,7 +91,7 @@ Find the full ID of the intended disposable sandbox with `docker ps --no-trunc`.
 Check the ID carefully. Then pass that ID and the reviewed paths:
 
 ```sh
-node agents/cloud-coding/scripts/snapshot.mjs <full-container-id> <reviewed-commit-id> path/to/reviewed-file
+node scripts/snapshot.mjs <full-container-id> <reviewed-commit-id> path/to/reviewed-file
 ```
 
 The command accepts the local Node 24 image used by the current Cloudflare
@@ -161,7 +161,7 @@ Then use the full container ID, the reviewed commit ID, the local setup image,
 the absolute host pnpm store path, and the reviewed file paths:
 
 ```sh
-node agents/cloud-coding/scripts/prepare.mjs /Users/santoshvenkatraman/Personal/Coding/prompt-shelf \
+node scripts/prepare.mjs /Users/santoshvenkatraman/Personal/Coding/prompt-shelf \
   <full-container-id> <reviewed-commit-id> \
   <local-setup-image> <absolute-pnpm-store-path> \
   package.json pnpm-lock.yaml pnpm-workspace.yaml app/package.json <other-reviewed-files>
@@ -193,7 +193,7 @@ a setup image with pnpm 10 and the matching managed Node image digest:
 
 ```sh
 CLOUD_CODING_TEST_IMAGE=<setup-image> CLOUD_CODING_NODE_IMAGE=<node-image-with-digest> \
-  node --test agents/cloud-coding/test/prepare.integration.test.mjs
+  node --test test/prepare.integration.test.mjs
 ```
 
 ## Connect the offline container to Codex
@@ -226,15 +226,15 @@ values of at least 32 bytes. Do not put them in chat or commit them. Set
 bridge:
 
 ```sh
-node agents/cloud-coding/scripts/local-broker.mjs
+node scripts/local-broker.mjs
 ```
 
-Create `agents/cloud-coding/.dev.vars` with `LOCAL_BROKER_TOKEN` and
+Create `.dev.vars` with `LOCAL_BROKER_TOKEN` and
 `MCP_BEARER_TOKEN`. The cloud-coding `.gitignore` excludes this file. Keep it
 private and delete it when finished. Start the local Worker:
 
 ```sh
-pnpm --filter cloud-coding exec wrangler dev --local --config wrangler.local.jsonc --port 8802
+pnpm exec wrangler dev --local --config wrangler.local.jsonc --port 8802
 ```
 
 Connect a local Codex MCP client to `http://127.0.0.1:8802/mcp` with the MCP
@@ -262,7 +262,7 @@ To test patch retrieval through MCP with a disposable TypeScript fixture, set
 
 ```sh
 export PATCH_SMOKE_PATH=src/file.ts
-node agents/cloud-coding/test/local-patch-mcp-smoke.mjs
+node test/local-patch-mcp-smoke.mjs
 ```
 
 The smoke test appends a marker comment to that file in the container, requests
@@ -274,7 +274,7 @@ run this smoke test from the repository root. Set `MCP_BEARER_TOKEN` in the
 environment first.
 
 ```sh
-node agents/cloud-coding/test/local-bridge-smoke.mjs
+node test/local-bridge-smoke.mjs
 ```
 
 It checks MCP authentication, tool discovery, patch retrieval, a project

@@ -14,7 +14,7 @@ if (
   !paths.length
 ) {
   console.error(
-    "Usage: node agents/cloud-coding/scripts/prepare.mjs <source-repository> <full-container-id> <reviewed-commit-id> <local-setup-image> <pnpm-store-path> <reviewed-file>...",
+    "Usage: node scripts/prepare.mjs <source-repository> <full-container-id> <reviewed-commit-id> <local-setup-image> <pnpm-store-path> <reviewed-file>...",
   );
   process.exit(1);
 }

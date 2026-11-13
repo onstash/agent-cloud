@@ -72,7 +72,7 @@ test(
       ]);
       run("docker", ["exec", container, "mkdir", "/workspace"]);
       run("node", [
-        "agents/cloud-coding/scripts/prepare.mjs",
+        "scripts/prepare.mjs",
         repo,
         container,
         commit,
@@ -100,7 +100,7 @@ test(
         run(
           "node",
           [
-            "agents/cloud-coding/scripts/prepare.mjs",
+            "scripts/prepare.mjs",
             repo,
             container,
             commit,

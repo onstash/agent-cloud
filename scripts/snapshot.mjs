@@ -140,7 +140,7 @@ function main() {
 
   if (!id || !/^[0-9a-f]{64}$/.test(id) || !/^[0-9a-f]{40,64}$/.test(reviewedCommit ?? "")) {
     throw new Error(
-      "Usage: node agents/cloud-coding/scripts/snapshot.mjs <full-container-id> <reviewed-commit-id> <reviewed-file>...",
+      "Usage: node scripts/snapshot.mjs <full-container-id> <reviewed-commit-id> <reviewed-file>...",
     );
   }
 

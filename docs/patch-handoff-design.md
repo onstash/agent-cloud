@@ -43,7 +43,7 @@ trusted baseline stays on the host.
 
 ## Constraints
 
-- Keep the script, tests, and documentation inside `agents/cloud-coding/`.
+- Keep the script, tests, and documentation inside this repository.
 - Reuse the snapshot path rules and container checks where practical.
 - Use only local Git and Docker operations. Do not use the network.
 - The operator must review the patch before applying it.
