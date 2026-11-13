@@ -158,7 +158,7 @@ export default {
 
     const server = openApiMcpServer({
       spec,
-      name: "cloud-coding",
+      name: "agent-cloud",
       version: "1.0.0",
       executor: new DynamicWorkerExecutor({
         loader: env.LOADER,

@@ -8,7 +8,7 @@ import { test } from "node:test";
 // This opt-in test needs a local setup image and the exact managed Node image digest.
 test(
   "prepares a cached dependency in a networkless execution container",
-  { skip: !process.env.CLOUD_CODING_TEST_IMAGE || !process.env.CLOUD_CODING_NODE_IMAGE },
+  { skip: !process.env.AGENT_CLOUD_TEST_IMAGE || !process.env.AGENT_CLOUD_NODE_IMAGE },
   () => {
     const root = mkdtempSync(join(tmpdir(), "cloud-prepare-"));
     const repo = join(root, "repo");
@@ -33,7 +33,7 @@ test(
         `type=bind,src=${repo},dst=/project`,
         "--mount",
         `type=bind,src=${store},dst=/store`,
-        process.env.CLOUD_CODING_TEST_IMAGE,
+        process.env.AGENT_CLOUD_TEST_IMAGE,
         "pnpm",
         "--dir",
         "/project",
@@ -57,7 +57,7 @@ test(
         "fixture",
       ]);
       const commit = run("git", ["-C", repo, "rev-parse", "HEAD"]);
-      const name = `workerd-cloud-coding-Workspace-${process.pid.toString(16)}`;
+      const name = `workerd-agent-cloud-Workspace-${process.pid.toString(16)}`;
       container = run("docker", [
         "run",
         "-d",
@@ -67,7 +67,7 @@ test(
         name,
         "--entrypoint",
         "sleep",
-        process.env.CLOUD_CODING_NODE_IMAGE,
+        process.env.AGENT_CLOUD_NODE_IMAGE,
         "infinity",
       ]);
       run("docker", ["exec", container, "mkdir", "/workspace"]);
@@ -76,7 +76,7 @@ test(
         repo,
         container,
         commit,
-        process.env.CLOUD_CODING_TEST_IMAGE,
+        process.env.AGENT_CLOUD_TEST_IMAGE,
         join(store, "v10"),
         "package.json",
         "pnpm-lock.yaml",
@@ -104,7 +104,7 @@ test(
             repo,
             container,
             commit,
-            process.env.CLOUD_CODING_TEST_IMAGE,
+            process.env.AGENT_CLOUD_TEST_IMAGE,
             store,
             "package.json",
             "pnpm-lock.yaml",

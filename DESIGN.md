@@ -1,10 +1,11 @@
-# Cloud coding experiment: design for review
+# Agent cloud experiment: design for review
 
 ## Purpose
 
 Build a small cloud coding system to learn its boundaries through use.
 Keep the project open source and suitable for self-deployment.
-Use Cloudflare infrastructure and an existing agent for the first experiment.
+Keep the public API independent of the runtime and connect an existing agent
+for the first experiment.
 
 ## First result
 
@@ -18,12 +19,12 @@ Start with a repeatable fixture. A user-selected public repository is the next m
 
 ## Approaches
 
-1. **Cloudflare Code Mode and Sandbox.** Use Code Mode for MCP discovery and execution. Use a separate Linux sandbox for workspace commands. This is the preferred experiment because it tests the proposed boundaries directly.
+1. **Script runner and Linux workspace.** Use a bounded script runner for MCP discovery and execution. Use a separate Linux workspace for repository commands. This is the preferred experiment because it tests the proposed boundaries directly.
 2. **Direct MCP tools and Sandbox.** Expose workspace operations as separate MCP tools. This is simpler for a small API, but does not test the two-tool interface.
 3. **A custom agent harness.** Run the agent loop inside the project. This gives more control, but adds model and session concerns before the workspace works.
 
 The first approach is the working choice from our discussion. Its fit remains an experiment.
-If Code Mode cannot support the required operations, record the cause and use the smallest workable alternative.
+If the script sandbox cannot support the required operations, record the cause and use the smallest workable alternative.
 
 ## Boundaries
 
@@ -34,10 +35,11 @@ Codex
         -> disposable Linux sandbox: fixture, edits, tests, patch
 ```
 
-The MCP server uses Cloudflare Code Mode for `search` and `execute` if its API fits.
-Code Mode runs agent-authored JavaScript in an isolated Worker.
-The Linux sandbox runs workspace commands. These are separate execution environments.
-The host controls which workspace operations Code Mode can call.
+The MCP server exposes `search` and `execute` if the script runner supports
+their contracts. The script runner executes agent-authored JavaScript with
+bounded access to workspace operations. The Linux workspace runs repository
+commands. These are separate execution environments. The host controls which
+workspace operations the script runner can call.
 
 One task uses one workspace. The workspace has a bounded lifetime and resource limits.
 The first workspace holds a single fixture and receives no secrets.
@@ -52,7 +54,7 @@ The experiment checks a denied connection from inside the workspace.
 One failed connection alone does not prove that every network path is blocked.
 
 Later, dependency installation may use a separate setup phase or sandbox.
-The implementation must check that the chosen Cloudflare network controls support that separation.
+The implementation must check that the chosen network controls support that separation.
 An allowlist alone does not prevent data leakage. Package installation can also run scripts.
 
 ## Task lifecycle and results
@@ -83,11 +85,12 @@ The experiment must not claim production security from a single successful test.
 
 ## Questions for the experiment
 
-- Can Code Mode expose the workspace operations through its existing OpenAPI integration?
+- Can the script runner expose workspace operations through a stable operation
+  schema?
 - Which client authentication method works for a self-deployed Codex connection?
 - Can the sandbox deny outbound traffic and preserve the test workspace as required?
 - Can command status survive a client disconnect within the chosen lifetime limits?
-- What Cloudflare account, billing, and local development requirements apply at deployment time?
+- What runtime limits and local development requirements apply to an adapter?
 
 ## Completion checks
 
@@ -100,7 +103,4 @@ The experiment must not claim production security from a single successful test.
 
 ## References
 
-- [Cloudflare Code Mode MCP server](https://developers.cloudflare.com/agents/model-context-protocol/guides/build-codemode-mcp-server/)
-- [Cloudflare Sandbox network access](https://developers.cloudflare.com/sandbox/network/)
-- [Cloudflare Sandbox lifecycle](https://developers.cloudflare.com/sandbox/concepts/lifetime/)
 - [Pi Durable](https://github.com/earendil-works/pi/blob/main/packages/durable/README.md)

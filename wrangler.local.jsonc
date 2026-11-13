@@ -1,5 +1,5 @@
 {
-  "name": "cloud-coding-local",
+  "name": "agent-cloud-local",
   "main": "src/local-server.ts",
   "compatibility_date": "2026-11-05",
   "compatibility_flags": ["nodejs_compat"],
